@@ -1,3 +1,12 @@
 <Solution>
+  <Folder Name="/ClassLibraries/">
+    <Project Path="MyShop.Application/MyShop.Application.csproj" />
+    <Project Path="MyShop.Domain/MyShop.Domain.csproj" />
+    <Project Path="MyShop.Infrastructure/MyShop.Infrastructure.csproj" />
+    <Project Path="MyShop.IoC/MyShop.IoC.csproj" />
+    <Project Path="MyShop.Models/MyShop.Models.csproj" />
+    <Project Path="MyShop.Shared/MyShop.Shared.csproj" />
+  </Folder>
   <Project Path="MyShop.Api/MyShop.Api.csproj" />
+  <Project Path="MyShop.Tests/MyShop.Tests.csproj" />
 </Solution>
