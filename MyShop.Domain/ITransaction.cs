@@ -1,0 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MyShop.Domain
+{
+    public interface ITransaction : IAsyncDisposable
+    {
+        Task CommitAsync(CancellationToken ct = default);
+    }
+}
