@@ -21,11 +21,13 @@ public partial class Account
 
     public DateTime? UpdatedAt { get; set; }
 
-    public string? CreatedBy { get; set; }
+    public long? CreatedBy { get; set; }
 
-    public string? UpdatedBy { get; set; }
+    public long? UpdatedBy { get; set; }
 
     public virtual ICollection<AccountRole> AccountRoles { get; set; } = new List<AccountRole>();
+
+    public virtual AdminAccount? AdminAccount { get; set; }
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 

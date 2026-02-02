@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 namespace MyShop.Infrastructure.EF.Models;
 
-public partial class Role
+public partial class AdminRole
 {
-    public int RoleId { get; set; }
+    public long AdminRoleId { get; set; }
 
     public string RoleCode { get; set; } = null!;
 
     public string RoleName { get; set; } = null!;
+
+    public int Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -19,5 +21,7 @@ public partial class Role
 
     public long? UpdatedBy { get; set; }
 
-    public virtual ICollection<AccountRole> AccountRoles { get; set; } = new List<AccountRole>();
+    public virtual ICollection<AdminAccountAdminRole> AdminAccountAdminRoles { get; set; } = new List<AdminAccountAdminRole>();
+
+    public virtual ICollection<AdminRolePermission> AdminRolePermissions { get; set; } = new List<AdminRolePermission>();
 }

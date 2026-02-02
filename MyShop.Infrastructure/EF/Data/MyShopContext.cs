@@ -16,6 +16,14 @@ public partial class MyShopContext : DbContext
 
     public virtual DbSet<AccountRole> AccountRoles { get; set; }
 
+    public virtual DbSet<AdminAccount> AdminAccounts { get; set; }
+
+    public virtual DbSet<AdminAccountAdminRole> AdminAccountAdminRoles { get; set; }
+
+    public virtual DbSet<AdminRole> AdminRoles { get; set; }
+
+    public virtual DbSet<AdminRolePermission> AdminRolePermissions { get; set; }
+
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<CartItem> CartItems { get; set; }
@@ -29,6 +37,8 @@ public partial class MyShopContext : DbContext
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
+
+    public virtual DbSet<Permission> Permissions { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
 
@@ -55,12 +65,10 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Account_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.Email).HasMaxLength(254);
             entity.Property(e => e.LastLoginAt).HasPrecision(0);
             entity.Property(e => e.PasswordHash).HasMaxLength(200);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
             entity.Property(e => e.Username).HasMaxLength(50);
         });
 
@@ -75,9 +83,7 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_AccountRole_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Account).WithMany(p => p.AccountRoles)
                 .HasForeignKey(d => d.AccountId)
@@ -90,6 +96,88 @@ public partial class MyShopContext : DbContext
                 .HasConstraintName("FK_AccountRole_Role");
         });
 
+        modelBuilder.Entity<AdminAccount>(entity =>
+        {
+            entity.ToTable("AdminAccount");
+
+            entity.HasIndex(e => e.AccountId, "IX_AdminAccount_AccountId");
+
+            entity.HasIndex(e => e.AccountId, "UQ_AdminAccount_AccountId").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_AdminAccount_CreatedAt");
+            entity.Property(e => e.DisplayName).HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt).HasPrecision(0);
+
+            entity.HasOne(d => d.Account).WithOne(p => p.AdminAccount)
+                .HasForeignKey<AdminAccount>(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AdminAccount_Account");
+        });
+
+        modelBuilder.Entity<AdminAccountAdminRole>(entity =>
+        {
+            entity.HasKey(e => new { e.AdminAccountId, e.AdminRoleId });
+
+            entity.ToTable("AdminAccountAdminRole");
+
+            entity.HasIndex(e => e.AdminRoleId, "IX_AdminAccountAdminRole_AdminRoleId");
+
+            entity.Property(e => e.CreatedAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_AdminAccountAdminRole_CreatedAt");
+            entity.Property(e => e.UpdatedAt).HasPrecision(0);
+
+            entity.HasOne(d => d.AdminAccount).WithMany(p => p.AdminAccountAdminRoles)
+                .HasForeignKey(d => d.AdminAccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AdminAccountAdminRole_AdminAccount");
+
+            entity.HasOne(d => d.AdminRole).WithMany(p => p.AdminAccountAdminRoles)
+                .HasForeignKey(d => d.AdminRoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AdminAccountAdminRole_AdminRole");
+        });
+
+        modelBuilder.Entity<AdminRole>(entity =>
+        {
+            entity.ToTable("AdminRole");
+
+            entity.HasIndex(e => e.RoleCode, "UQ_AdminRole_RoleCode").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_AdminRole_CreatedAt");
+            entity.Property(e => e.RoleCode).HasMaxLength(50);
+            entity.Property(e => e.RoleName).HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt).HasPrecision(0);
+        });
+
+        modelBuilder.Entity<AdminRolePermission>(entity =>
+        {
+            entity.HasKey(e => new { e.AdminRoleId, e.PermissionId });
+
+            entity.ToTable("AdminRolePermission");
+
+            entity.HasIndex(e => e.PermissionId, "IX_AdminRolePermission_PermissionId");
+
+            entity.Property(e => e.CreatedAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_AdminRolePermission_CreatedAt");
+            entity.Property(e => e.UpdatedAt).HasPrecision(0);
+
+            entity.HasOne(d => d.AdminRole).WithMany(p => p.AdminRolePermissions)
+                .HasForeignKey(d => d.AdminRoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AdminRolePermission_AdminRole");
+
+            entity.HasOne(d => d.Permission).WithMany(p => p.AdminRolePermissions)
+                .HasForeignKey(d => d.PermissionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AdminRolePermission_Permission");
+        });
+
         modelBuilder.Entity<Cart>(entity =>
         {
             entity.ToTable("Cart");
@@ -99,9 +187,7 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Cart_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Account).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.AccountId)
@@ -120,9 +206,7 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_CartItem_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.CartId)
@@ -147,9 +231,7 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Category_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.ParentCategory).WithMany(p => p.InverseParentCategory)
                 .HasForeignKey(d => d.ParentCategoryId)
@@ -171,9 +253,7 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_FavoriteStore_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Account).WithMany(p => p.FavoriteStores)
                 .HasForeignKey(d => d.AccountId)
@@ -196,9 +276,7 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_HotStore_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Store).WithOne(p => p.HotStore)
                 .HasForeignKey<HotStore>(d => d.StoreId)
@@ -217,10 +295,8 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Order_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.BuyerAccount).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.BuyerAccountId)
@@ -242,10 +318,8 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_OrderItem_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
@@ -256,6 +330,20 @@ public partial class MyShopContext : DbContext
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OrderItem_Product");
+        });
+
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.ToTable("Permission");
+
+            entity.HasIndex(e => e.PermissionCode, "UQ_Permission_PermissionCode").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_Permission_CreatedAt");
+            entity.Property(e => e.PermissionCode).HasMaxLength(100);
+            entity.Property(e => e.PermissionName).HasMaxLength(200);
+            entity.Property(e => e.UpdatedAt).HasPrecision(0);
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -269,11 +357,9 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Product_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ProductName).HasMaxLength(200);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -297,10 +383,8 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_ProductImage_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.ImageUrl).HasMaxLength(500);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductImages)
                 .HasForeignKey(d => d.ProductId)
@@ -317,11 +401,9 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Role_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.RoleCode).HasMaxLength(30);
             entity.Property(e => e.RoleName).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Store>(entity =>
@@ -333,11 +415,9 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_Store_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.StoreName).HasMaxLength(100);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Vendor).WithMany(p => p.Stores)
                 .HasForeignKey(d => d.VendorId)
@@ -356,12 +436,10 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_StoreAdvertisement_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.EndAt).HasPrecision(0);
             entity.Property(e => e.ImageUrl).HasMaxLength(500);
             entity.Property(e => e.StartAt).HasPrecision(0);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Store).WithMany(p => p.StoreAdvertisements)
                 .HasForeignKey(d => d.StoreId)
@@ -378,11 +456,9 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_SystemAnnouncement_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.PublishAt).HasPrecision(0);
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
         });
 
         modelBuilder.Entity<VendorProfile>(entity =>
@@ -396,11 +472,9 @@ public partial class MyShopContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasPrecision(0)
                 .HasDefaultValueSql("(sysutcdatetime())", "DF_VendorProfile_CreatedAt");
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
             entity.Property(e => e.ReviewComment).HasMaxLength(500);
             entity.Property(e => e.ReviewedAt).HasPrecision(0);
             entity.Property(e => e.UpdatedAt).HasPrecision(0);
-            entity.Property(e => e.UpdatedBy).HasMaxLength(50);
 
             entity.HasOne(d => d.Account).WithOne(p => p.VendorProfile)
                 .HasForeignKey<VendorProfile>(d => d.AccountId)

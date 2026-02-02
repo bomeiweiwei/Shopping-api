@@ -13,9 +13,9 @@ public partial class AccountRole
 
     public DateTime? UpdatedAt { get; set; }
 
-    public string? CreatedBy { get; set; }
+    public long? CreatedBy { get; set; }
 
-    public string? UpdatedBy { get; set; }
+    public long? UpdatedBy { get; set; }
 
     public virtual Account Account { get; set; } = null!;
 

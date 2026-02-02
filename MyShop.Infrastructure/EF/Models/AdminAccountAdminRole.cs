@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace MyShop.Infrastructure.EF.Models;
 
-public partial class FavoriteStore
+public partial class AdminAccountAdminRole
 {
-    public long AccountId { get; set; }
+    public long AdminAccountId { get; set; }
 
-    public long StoreId { get; set; }
+    public long AdminRoleId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -17,7 +17,7 @@ public partial class FavoriteStore
 
     public long? UpdatedBy { get; set; }
 
-    public virtual Account Account { get; set; } = null!;
+    public virtual AdminAccount AdminAccount { get; set; } = null!;
 
-    public virtual Store Store { get; set; } = null!;
+    public virtual AdminRole AdminRole { get; set; } = null!;
 }
