@@ -7,5 +7,6 @@ namespace MyShop.Models.Resp.Identity
     public class LoginResp
     {
         public bool IsLoginSuccess { get; set; }
+        public string JwtToken { get; set; }
     }
 }

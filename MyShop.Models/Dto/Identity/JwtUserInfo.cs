@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyShop.Models.Dto
+namespace MyShop.Models.Dto.Identity
 {
-    public class AccountDto
+    public class JwtUserInfo
     {
         public long AccountId { get; set; }
         public string UserName { get; set; }
-        public string PasswordHash { get; set; }
+        public DateTime Expiration { get; set; }
     }
 }

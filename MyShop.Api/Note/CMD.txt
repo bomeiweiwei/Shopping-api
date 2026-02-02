@@ -7,6 +7,12 @@ dotnet user-secrets set "ConnectionStrings:SlaveConnection" "Server=localhost,14
 
 dotnet user-secrets set "ConnectionStrings:RedisConnection" "localhost:6379,password=,abortConnect=false,syncTimeout=10000,defaultDatabase="
 
+dotnet user-secrets set "Jwt:Key" ""
+
+dotnet user-secrets set "Jwt:Issuer" ""
+
+dotnet user-secrets set "Jwt:Audience" ""
+
 dotnet user-secrets list
 
 dotnet ef dbcontext scaffold ^

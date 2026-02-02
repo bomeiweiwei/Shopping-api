@@ -21,11 +21,24 @@ namespace MyShop.Api.Controllers
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
+        //[HttpPost]
+        //[Route("ChkLogin")]
+        //public async Task<IActionResult> ChkLogin(LoginReq req)
+        //{
+        //    var result = await _service.ChkLogin(req);
+        //    return Ok(new { result });
+        //}
+
+        /// <summary>
+        /// 登入
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("ChkLogin")]
-        public async Task<IActionResult> ChkLogin(LoginReq req)
+        [Route("Login")]
+        public async Task<IActionResult> Login(LoginReq req)
         {
-            var result = await _service.ChkLogin(req);
+            var result = await _service.Login(req);
             return Ok(new { result });
         }
     }

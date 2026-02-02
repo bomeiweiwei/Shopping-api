@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using MyShop.Api.Filters;
 
 namespace MyShop.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [JwtAuthActionFilter]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries =

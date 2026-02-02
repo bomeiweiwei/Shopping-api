@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyShop.Models.Dto
+namespace MyShop.Models.Dto.Account
 {
     public class AccountDetailDto: AccountDto
     {

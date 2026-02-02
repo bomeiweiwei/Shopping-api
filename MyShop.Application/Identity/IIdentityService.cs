@@ -16,5 +16,12 @@ namespace MyShop.Application.Identity
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponseBase<LoginResp>> ChkLogin(LoginReq req, CancellationToken ct = default);
+        /// <summary>
+        /// 登入
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponseBase<LoginResp>> Login(LoginReq req, CancellationToken ct = default);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using MyShop.Domain;
 using MyShop.Domain.Account;
 using MyShop.Models;
-using MyShop.Models.Dto;
+using MyShop.Models.Dto.Account;
 using MyShop.Models.Req.Account;
 using MyShop.Shared.Enums;
 using System;

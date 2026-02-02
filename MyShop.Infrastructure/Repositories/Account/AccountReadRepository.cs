@@ -4,7 +4,7 @@ using MyShop.Domain.Account;
 using MyShop.Infrastructure.EF;
 using MyShop.Infrastructure.EF.Data;
 using MyShop.Models;
-using MyShop.Models.Dto;
+using MyShop.Models.Dto.Account;
 using MyShop.Models.Req.Account;
 using MyShop.Models.Req.Identity;
 using MyShop.Shared.Enums;

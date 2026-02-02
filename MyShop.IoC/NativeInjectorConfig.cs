@@ -6,7 +6,7 @@ using MyShop.Application.Redis;
 using MyShop.Application.Redis.implement;
 using MyShop.Domain;
 using MyShop.Infrastructure.EF;
-using MyShop.Models.Dto;
+using MyShop.Models.Dto.Account;
 using MyShop.Shared.SysConfigs;
 using StackExchange.Redis;
 
