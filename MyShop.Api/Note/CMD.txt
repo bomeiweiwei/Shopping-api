@@ -5,6 +5,8 @@ dotnet user-secrets set "ConnectionStrings:MasterConnection" "Server=localhost,1
 
 dotnet user-secrets set "ConnectionStrings:SlaveConnection" "Server=localhost,1433;Database=;User Id=;Password=;Encrypt=True;TrustServerCertificate=True;"
 
+dotnet user-secrets set "ConnectionStrings:RedisConnection" "localhost:6379,password=,abortConnect=false,syncTimeout=10000,defaultDatabase="
+
 dotnet user-secrets list
 
 dotnet ef dbcontext scaffold ^

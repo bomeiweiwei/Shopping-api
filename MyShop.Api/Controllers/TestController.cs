@@ -37,5 +37,21 @@ namespace MyShop.Api.Controllers
             var connectResult = await _testService.GetConnectResult();
             return Ok(new { connectResult });
         }
+
+        [HttpGet]
+        [Route("TrySetRedis")]
+        public async Task<IActionResult> TrySetRedis(string key, string value)
+        {
+            var result = await _testService.TrySetRedis(key, value, TimeSpan.FromMinutes(10));
+            return Ok(new { result });
+        }
+
+        [HttpGet]
+        [Route("TryGetRedis")]
+        public async Task<IActionResult> TryGetRedis(string key)
+        {
+            var result = await _testService.TryGetRedis(key);
+            return Ok(new { result });
+        }
     }
 }

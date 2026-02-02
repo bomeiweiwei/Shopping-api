@@ -8,6 +8,8 @@ namespace MyShop.Shared.SysConfigs
         public string Master { get; }
         public string Slave { get; }
 
+        public string Redis { get; }
+
         public ConnectionStringsSection(IConfiguration config)
         {
             var sec = config.GetRequiredSection("ConnectionStrings");
@@ -15,6 +17,8 @@ namespace MyShop.Shared.SysConfigs
                      ?? throw new InvalidOperationException("Missing ConnectionStrings:MasterConnection");
             Slave = sec["SlaveConnection"]
                      ?? throw new InvalidOperationException("Missing ConnectionStrings:SlaveConnection");
+            Redis = sec["RedisConnection"]
+                     ?? throw new InvalidOperationException("Missing ConnectionStrings:RedisConnection");
         }
     }
 }
