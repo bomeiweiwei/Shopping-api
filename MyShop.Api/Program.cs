@@ -2,6 +2,7 @@ using MyShop.IoC;
 using MyShop.Shared.Enums;
 using MyShop.Shared.Extensions;
 using MyShop.Shared.SysConfigs;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi(); // => /openapi/v1.json
+    app.MapScalarApiReference("/docs", options =>
+    {
+        options.Title = "MyShop API Docs";
+    });
 }
 
 app.UseHttpsRedirection();
