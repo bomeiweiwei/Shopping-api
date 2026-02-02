@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyShop.Application;
 using MyShop.Domain;
 using MyShop.Infrastructure.EF;
+using MyShop.Models.Dto;
 
 namespace MyShop.IoC
 {
@@ -10,6 +12,7 @@ namespace MyShop.IoC
     {
         public static void RegisterService(this IServiceCollection services, IConfiguration config)
         {
+            services.AddSingleton<IPasswordHasher<AccountDto>, PasswordHasher<AccountDto>>();
             // 固定線
             services.AddScoped<IMyShopDbContextFactory, MyShopDbContextFactory>();
             // 重試策略
