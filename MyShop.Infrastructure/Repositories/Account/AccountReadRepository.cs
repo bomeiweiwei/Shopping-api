@@ -30,7 +30,7 @@ namespace MyShop.Infrastructure.Repositories.Account
             using var ctx = _factory.Create(ConnectionMode.Slave);
             var db = ctx.AsDbContext<MyShopContext>();
 
-            var account = await db.Accounts.FirstOrDefaultAsync(a => a.Username == req.UserName, ct);
+            var account = await db.Accounts.FirstOrDefaultAsync(a => a.Username == req.UserName && a.Status == (int)Status.Active, ct);
             if (account != null)
             {
                 result.AccountId = account.AccountId;

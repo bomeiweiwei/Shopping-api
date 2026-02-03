@@ -137,5 +137,63 @@ namespace MyShop.Application.Identity.implement
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        
+        /// <summary>
+        /// 驗證登入資料
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<VerifyLogin> VerifyLoginData(LoginReq req, CancellationToken ct = default) 
+        {
+            VerifyLogin result = new VerifyLogin()
+            {
+                IsVerifySuccess = false,
+                Data = null
+            };
+
+            GetAccountReq getAccountReq = new GetAccountReq()
+            {
+                UserName = req.UserName
+            };
+            var account = await _accountReadService.GetLoginAccountData(getAccountReq, ct);
+            if (account == null)
+                return result;
+
+            var verify = _hasher.VerifyHashedPassword(account, account.PasswordHash, req.Password);
+            if (verify == PasswordVerificationResult.Failed)
+            {
+                return result;
+            }
+
+            req.Password = string.Empty; //不回傳密碼
+            account.PasswordHash = string.Empty; //不回傳密碼雜湊
+            
+            result.IsVerifySuccess = true;
+            result.Data = account;
+
+            return result;
+        }
+        /// <summary>
+        /// 取得JwtToken
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <param name="ttl"></param>
+        /// <returns></returns>
+        public async Task<string> GetJwtToken(List<Claim> claims, DateTime expiration) 
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigManager.Jwt.Key));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: ConfigManager.Jwt.Issuer,
+                audience: ConfigManager.Jwt.Audience,
+                claims: claims,
+                expires: expiration,
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

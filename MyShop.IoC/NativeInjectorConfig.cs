@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyShop.Application;
+using MyShop.Application.Identity;
+using MyShop.Application.Identity.implement;
 using MyShop.Application.Redis;
 using MyShop.Application.Redis.implement;
 using MyShop.Domain;
@@ -31,6 +33,13 @@ namespace MyShop.IoC
                 return ConnectionMultiplexer.Connect(options);
             });
             services.AddSingleton<IRedisService, RedisService>();
+
+            // 統一登入入口
+            services.AddScoped<ILoginManagerService, LoginManagerService>();
+            // 多實作介面：ILoginService（會注入到 IEnumerable<ILoginService>）
+            services.AddScoped<ILoginService, AdminUserLoginService>();
+            services.AddScoped<ILoginService, VendorUserLoginService>();
+            services.AddScoped<ILoginService, MemberUserLoginService>();
 
             // 固定線
             services.AddScoped<IMyShopDbContextFactory, MyShopDbContextFactory>();

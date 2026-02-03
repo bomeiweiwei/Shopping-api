@@ -1,0 +1,109 @@
+﻿using MyShop.Application.Redis;
+using MyShop.Domain;
+using MyShop.Domain.AccountRole;
+using MyShop.Domain.AdminPermission;
+using MyShop.Models;
+using MyShop.Models.Dto.Identity;
+using MyShop.Models.Req.AccountRole;
+using MyShop.Models.Req.AdminPermission;
+using MyShop.Models.Req.Identity;
+using MyShop.Models.Resp.Identity;
+using MyShop.Shared.Enums;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Text;
+
+namespace MyShop.Application.Identity.implement
+{
+    public class AdminUserLoginService : BaseService, ILoginService
+    {
+        public UserRole userRole => UserRole.Admin;
+
+        private readonly IIdentityService _identityService;
+        private readonly IRedisService _redis;
+        private readonly IAccountRoleReadRepository _accountRoleReadRepository;
+        private readonly IAdminPermissionReadRepository _adminPermissionReadRepository;
+        public AdminUserLoginService(IMyShopDbContextFactory factory, IIdentityService identityService, IRedisService redis, IAccountRoleReadRepository accountRoleReadRepository, IAdminPermissionReadRepository adminPermissionReadRepository) : base(factory)
+        {
+            _identityService = identityService;
+            _redis = redis;
+            _accountRoleReadRepository = accountRoleReadRepository;
+            _adminPermissionReadRepository = adminPermissionReadRepository;
+        }
+
+        /// <summary>
+        /// 登入
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponseBase<LoginResp>> Login(LoginReq req, CancellationToken ct = default)
+        {
+            var result = new ApiResponseBase<LoginResp>()
+            {
+                Data = new LoginResp()
+                {
+                    IsLoginSuccess = false,
+                    JwtToken = string.Empty
+                }
+            };
+            var verify = await _identityService.VerifyLoginData(req, ct);
+            if (!verify.IsVerifySuccess)
+                return result;
+            if (verify.Data == null)
+                return result;
+            // 取得帳號資料
+            var account = verify.Data;
+
+            GetAccountRoleReq getAccountRoleReq = new GetAccountRoleReq()
+            {
+                AccountId = account.AccountId,
+                RoleId = (int)userRole
+            };
+            var chkRoleData = await _accountRoleReadRepository.GetAccountRoleData(getAccountRoleReq, ct);
+            if (chkRoleData == null)
+                return result;
+
+            GetAdminPermissionsDataReq getAdminPermissionsDataReq = new GetAdminPermissionsDataReq()
+            {
+                AccountId = account.AccountId
+            };
+            List<long> permissions = await _adminPermissionReadRepository.GetAdminPermissionsData(getAdminPermissionsDataReq, ct);
+
+            // 設定時間
+            DateTime expirationTime = DateTime.UtcNow.AddDays(1);
+            TimeSpan ttl = expirationTime - DateTime.UtcNow;
+            // 設定JwtUserInfo
+            //JwtUserInfo userInfo = new JwtUserInfo()
+            //{
+            //    AccountId = account.AccountId,
+            //    UserName = account.UserName,
+            //    AccountRole = (int)userRole,
+            //    Expiration = expirationTime
+            //};
+            // 設定Claims
+            var claims = new List<Claim>
+            {
+                new Claim("AccountId", account.AccountId.ToString()),
+                new Claim("UserName", account.UserName),
+                new Claim("UserRole", userRole.ToString()),
+                new Claim("Expiration",expirationTime.ToString("o"))
+            };
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("Permission", permission.ToString()));
+            }
+            // 產生Token
+            var token = await _identityService.GetJwtToken(claims, expirationTime);
+
+            //存redis
+            await _redis.SetStringAsync($"Login:{account.AccountId}", token, ttl);
+
+            result.Data.IsLoginSuccess = true;
+            result.Data.JwtToken = token;
+
+            return result;
+        }
+    }
+}

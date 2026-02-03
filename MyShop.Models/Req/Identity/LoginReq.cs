@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyShop.Shared.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -12,5 +13,7 @@ namespace MyShop.Models.Req.Identity
 
         [Required]
         public string Password { get; set; }
+
+        public UserRole userRole { get; set; } = UserRole.Member;
     }
 }

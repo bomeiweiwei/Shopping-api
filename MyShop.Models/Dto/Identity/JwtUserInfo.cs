@@ -8,6 +8,7 @@ namespace MyShop.Models.Dto.Identity
     {
         public long AccountId { get; set; }
         public string UserName { get; set; }
+        public int AccountRole { get; set; }
         public DateTime Expiration { get; set; }
     }
 }

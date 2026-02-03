@@ -12,9 +12,11 @@ namespace MyShop.Api.Controllers
     public class IdentityController : ControllerBase
     {
         private readonly IIdentityService _service;
-        public IdentityController(IIdentityService service)
+        private readonly ILoginManagerService _loginManagerService;
+        public IdentityController(IIdentityService service, ILoginManagerService loginManagerService)
         {
             _service = service;
+            _loginManagerService = loginManagerService;
         }
         /// <summary>
         /// 檢查是否能登入
@@ -38,7 +40,7 @@ namespace MyShop.Api.Controllers
         [Route("Login")]
         public async Task<IActionResult> Login(LoginReq req)
         {
-            var result = await _service.Login(req);
+            var result = await _loginManagerService.UserLogin(req);
             return Ok(new { result });
         }
     }
