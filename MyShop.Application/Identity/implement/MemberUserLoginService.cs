@@ -48,11 +48,11 @@ namespace MyShop.Application.Identity.implement
                 return result;
             // 取得帳號資料
             var account = verify.Data;
-
+            int roleId = (int)userRole;
             GetAccountRoleReq getAccountRoleReq = new GetAccountRoleReq()
             {
                 AccountId = account.AccountId,
-                RoleId = (int)userRole
+                RoleId = roleId
             };
             var chkRoleData = await _accountRoleReadRepository.GetAccountRoleData(getAccountRoleReq, ct);
             if (chkRoleData == null)
@@ -74,7 +74,7 @@ namespace MyShop.Application.Identity.implement
             {
                 new Claim("AccountId", account.AccountId.ToString()),
                 new Claim("UserName", account.UserName),
-                new Claim("UserRole", userRole.ToString()),
+                new Claim("UserRole", roleId.ToString()),
                 new Claim("Expiration", expirationTime.ToString("o"))
             };
             // 產生Token

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using MyShop.Application.Redis;
 using MyShop.Models.Resp.Error;
+using MyShop.Shared.Enums;
 using MyShop.Shared.Helper;
 using MyShop.Shared.SysConfigs;
 using System.IdentityModel.Tokens.Jwt;
@@ -121,6 +122,40 @@ namespace MyShop.Api.Filters
             }
             else
             {
+                var loginRole = context.HttpContext.User.Claims
+                                .Where(c => c.Type == "UserRole")
+                                .Select(c => int.Parse(c.Value))
+                                .FirstOrDefault();
+
+                if (loginRole == (int)UserRole.Admin)
+                {
+                    // 權限檢查開始
+                    var permissionAttr = context.ActionDescriptor.EndpointMetadata
+                                        .OfType<PermissionAuthorizeAttribute>()
+                                        .FirstOrDefault();
+                    if (permissionAttr != null)
+                    {
+                        // 從 JWT 取得使用者擁有的權限 (ClaimType: "Permission")
+                        var userPermissions = context.HttpContext.User.Claims
+                            .Where(c => c.Type == "Permission")
+                            .Select(c => int.Parse(c.Value))
+                            .ToHashSet();
+
+                        // 是否有任一個必要權限
+                        bool hasPermission = permissionAttr.RequiredPermissions
+                            .Any(rp => userPermissions.Contains(rp));
+
+                        if (!hasPermission)
+                        {
+                            context.Result = new ObjectResult(new CustomErrorResponse("您沒有足夠的權限執行此操作", StatusCodes.Status403Forbidden))
+                            {
+                                StatusCode = StatusCodes.Status403Forbidden
+                            };
+                            return;
+                        }
+                    }
+                }
+
                 await next(); // 驗證通過，繼續執行原始 Action
             }
         }

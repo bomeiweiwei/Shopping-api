@@ -1,4 +1,5 @@
 ﻿using MyShop.Models.Dto.AccountRole;
+using MyShop.Models.Dto.AdminPermission;
 using MyShop.Models.Req.AccountRole;
 using MyShop.Models.Req.AdminPermission;
 using System;
@@ -9,6 +10,6 @@ namespace MyShop.Domain.AdminPermission
 {
     public interface IAdminPermissionReadRepository
     {
-        Task<List<long>> GetAdminPermissionsData(GetAdminPermissionsDataReq req, CancellationToken ct = default);
+        Task<List<AdminPermissionDto>> GetAdminPermissionsData(GetAdminPermissionsDataReq req, CancellationToken ct = default);
     }
 }

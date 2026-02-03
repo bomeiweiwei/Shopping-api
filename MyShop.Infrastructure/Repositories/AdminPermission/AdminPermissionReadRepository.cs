@@ -4,6 +4,7 @@ using MyShop.Domain.AdminPermission;
 using MyShop.Infrastructure.EF;
 using MyShop.Infrastructure.EF.Data;
 using MyShop.Models.Dto.AccountRole;
+using MyShop.Models.Dto.AdminPermission;
 using MyShop.Models.Req.AdminPermission;
 using MyShop.Shared.Enums;
 using System;
@@ -16,9 +17,9 @@ namespace MyShop.Infrastructure.Repositories.AdminPermission
     {
         private readonly IMyShopDbContextFactory _factory;
         public AdminPermissionReadRepository(IMyShopDbContextFactory factory) => _factory = factory;
-        public async Task<List<long>> GetAdminPermissionsData(GetAdminPermissionsDataReq req, CancellationToken ct = default)
+        public async Task<List<AdminPermissionDto>> GetAdminPermissionsData(GetAdminPermissionsDataReq req, CancellationToken ct = default)
         {
-            var result = new List<long>();
+            var result = new List<AdminPermissionDto>();
             using var ctx = _factory.Create(ConnectionMode.Slave);
             var db = ctx.AsDbContext<MyShopContext>();
 
@@ -30,7 +31,12 @@ namespace MyShop.Infrastructure.Repositories.AdminPermission
                        join a4 in db.AdminRolePermissions on a3.AdminRoleId equals a4.AdminRoleId
                        join p in db.Permissions on a4.PermissionId equals p.PermissionId
                        where m.AccountId == req.AccountId
-                       select p.PermissionId).Distinct().ToListAsync(ct);
+                       group p by new { p.PermissionId, p.PermissionCode } into g
+                       select new AdminPermissionDto
+                       {
+                           PermissionId = g.Key.PermissionId,
+                           PermissionCode = g.Key.PermissionCode
+                       }).ToListAsync(ct);
 
             return result;
         }
