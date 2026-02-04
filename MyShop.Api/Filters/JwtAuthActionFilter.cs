@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MyShop.Api.Attributes;
 using MyShop.Application.Redis;
 using MyShop.Models.Resp.Error;
 using MyShop.Shared.Enums;
@@ -122,28 +123,48 @@ namespace MyShop.Api.Filters
             }
             else
             {
-                var loginRole = context.HttpContext.User.Claims
-                                .Where(c => c.Type == "UserRole")
-                                .Select(c => int.Parse(c.Value))
-                                .FirstOrDefault();
+                var userRoles = context.HttpContext.User.Claims
+                                 .Where(c => c.Type == "UserRole")
+                                 .Select(c => int.TryParse(c.Value, out var r) ? r : (int?)null)
+                                 .Where(r => r.HasValue)
+                                 .Select(r => r!.Value)
+                                 .ToHashSet();
 
-                if (loginRole == (int)UserRole.Admin)
+                var roleAttr = context.ActionDescriptor.EndpointMetadata
+                                .OfType<RoleAuthorizeAttribute>()
+                                .FirstOrDefault();
+                #region 角色檢查
+                if (roleAttr != null)
                 {
-                    // 權限檢查開始
+                    bool roleAllowed = userRoles.Overlaps(roleAttr.AllowedRoles);
+
+                    if (!roleAllowed)
+                    {
+                        context.Result = new ObjectResult(
+                            new CustomErrorResponse("您的角色無權限存取此資源", StatusCodes.Status403Forbidden))
+                        {
+                            StatusCode = StatusCodes.Status403Forbidden
+                        };
+                        return;
+                    }
+                }
+                #endregion
+                #region 當角色為Admin時，進行方法的權限檢查
+                if (userRoles.Contains((int)UserRole.Admin))
+                {
+                    // 權限檢查開始（PermissionAuthorizeAttribute）
                     var permissionAttr = context.ActionDescriptor.EndpointMetadata
                                         .OfType<PermissionAuthorizeAttribute>()
                                         .FirstOrDefault();
+
                     if (permissionAttr != null)
                     {
-                        // 從 JWT 取得使用者擁有的權限 (ClaimType: "Permission")
                         var userPermissions = context.HttpContext.User.Claims
-                            .Where(c => c.Type == "Permission")
-                            .Select(c => int.Parse(c.Value))
-                            .ToHashSet();
+                                                .Where(c => c.Type == "Permission")
+                                                .Select(c => int.Parse(c.Value))
+                                                .ToHashSet();
 
-                        // 是否有任一個必要權限
-                        bool hasPermission = permissionAttr.RequiredPermissions
-                            .Any(rp => userPermissions.Contains(rp));
+                        bool hasPermission = permissionAttr.RequiredPermissions.Any(rp => userPermissions.Contains(rp));
 
                         if (!hasPermission)
                         {
@@ -155,6 +176,7 @@ namespace MyShop.Api.Filters
                         }
                     }
                 }
+                #endregion
 
                 await next(); // 驗證通過，繼續執行原始 Action
             }

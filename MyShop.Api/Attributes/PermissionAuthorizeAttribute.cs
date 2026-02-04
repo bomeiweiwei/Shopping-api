@@ -1,6 +1,6 @@
 ﻿using MyShop.Shared.Enums;
 
-namespace MyShop.Api.Filters
+namespace MyShop.Api.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class PermissionAuthorizeAttribute : Attribute
