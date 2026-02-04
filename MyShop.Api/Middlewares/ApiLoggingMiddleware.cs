@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Controllers;
+using MyShop.Shared.SysConfigs;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
@@ -19,6 +20,9 @@ namespace MyShop.Api.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             var stopwatch = Stopwatch.StartNew();
+            // 在讀 body 前先判斷敏感路徑
+            var isSensitive = IsSensitivePath(context);
+
             string requestBody = string.Empty;
             string responseBody = string.Empty;
             string methodName = "Unknown";
@@ -33,7 +37,11 @@ namespace MyShop.Api.Middlewares
                 // 將回應 Stream 替換為我們的 MemoryStream
                 context.Response.Body = responseBodyStream;
 
-                if (context.Request.ContentLength > 0 && context.Request.ContentType != null &&
+                if (isSensitive)
+                {
+                    requestBody = "[Skipped: Sensitive Endpoint]";
+                }
+                else if (context.Request.ContentLength > 0 && context.Request.ContentType != null &&
                     (context.Request.ContentType.Contains("application/json") ||
                      context.Request.ContentType.Contains("application/xml") ||
                      context.Request.ContentType.Contains("text/plain") ||
@@ -61,7 +69,11 @@ namespace MyShop.Api.Middlewares
                 await _next(context); // 如果這裡拋出例外，下面的讀取回應和複製將不會執行
 
                 // 如果沒有例外發生，則讀取回應內容
-                if (context.Response.Body.CanRead && context.Response.ContentType != null &&
+                if (isSensitive)
+                {
+                    responseBody = "[Skipped: Sensitive Endpoint]";
+                }
+                else if (context.Response.Body.CanRead && context.Response.ContentType != null &&
                     (context.Response.ContentType.Contains("application/json") ||
                      context.Response.ContentType.Contains("application/xml") ||
                      context.Response.ContentType.Contains("text/plain")))
@@ -153,6 +165,13 @@ namespace MyShop.Api.Middlewares
             {
                 return obj.ToString(); // 無法轉成 JSON 的話就原樣回傳
             }
+        }
+        private bool IsSensitivePath(HttpContext context)
+        {
+            var path = context.Request.Path.Value ?? "";
+            var keywords = ConfigManager.MyShop.ApiLogging.SensitivePathKeywords;
+            return keywords.Any(k =>
+                path.Contains(k, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
