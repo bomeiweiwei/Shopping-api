@@ -18,7 +18,7 @@ namespace MyShop.Application.Identity.implement
         private readonly IIdentityService _identityService;
         private readonly IRedisService _redis;
         private readonly IAccountRoleReadRepository _accountRoleReadRepository;
-        public MemberUserLoginService(IMyShopDbContextFactory factory, IIdentityService identityService, IRedisService redis, IAccountRoleReadRepository accountRoleReadRepository) : base(factory)
+        public MemberUserLoginService(IMyShopDbContextFactory factory, ICurrentUserAccessor currentUser, IIdentityService identityService, IRedisService redis, IAccountRoleReadRepository accountRoleReadRepository) : base(factory, currentUser)
         {
             _identityService = identityService;
             _redis = redis;

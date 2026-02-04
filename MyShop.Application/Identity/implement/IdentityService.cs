@@ -25,7 +25,7 @@ namespace MyShop.Application.Identity.implement
         private readonly IPasswordHasher<AccountDto> _hasher;
         private readonly IAccountReadService _accountReadService;
         private readonly IRedisService _redis;
-        public IdentityService(IMyShopDbContextFactory factory, IPasswordHasher<AccountDto> hasher, IAccountReadService accountReadService, IRedisService redis) : base(factory)
+        public IdentityService(IMyShopDbContextFactory factory, ICurrentUserAccessor currentUser, IPasswordHasher<AccountDto> hasher, IAccountReadService accountReadService, IRedisService redis) : base(factory, currentUser)
         {
             _hasher = hasher;
             _accountReadService = accountReadService;

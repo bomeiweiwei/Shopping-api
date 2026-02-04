@@ -12,7 +12,7 @@ namespace MyShop.Application.Identity.implement
     public class LoginManagerService : BaseService, ILoginManagerService
     {
         private readonly IEnumerable<ILoginService> _loginServices;
-        public LoginManagerService(IMyShopDbContextFactory factory, IEnumerable<ILoginService> loginServices) : base(factory)
+        public LoginManagerService(IMyShopDbContextFactory factory, ICurrentUserAccessor currentUser, IEnumerable<ILoginService> loginServices) : base(factory, currentUser)
         {
             _loginServices = loginServices;
         }

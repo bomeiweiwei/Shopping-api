@@ -24,7 +24,7 @@ namespace MyShop.Application.Identity.implement
         private readonly IRedisService _redis;
         private readonly IAccountRoleReadRepository _accountRoleReadRepository;
         private readonly IAdminPermissionReadRepository _adminPermissionReadRepository;
-        public AdminUserLoginService(IMyShopDbContextFactory factory, IIdentityService identityService, IRedisService redis, IAccountRoleReadRepository accountRoleReadRepository, IAdminPermissionReadRepository adminPermissionReadRepository) : base(factory)
+        public AdminUserLoginService(IMyShopDbContextFactory factory, ICurrentUserAccessor currentUser, IIdentityService identityService, IRedisService redis, IAccountRoleReadRepository accountRoleReadRepository, IAdminPermissionReadRepository adminPermissionReadRepository) : base(factory, currentUser)
         {
             _identityService = identityService;
             _redis = redis;

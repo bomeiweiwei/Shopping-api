@@ -1,4 +1,5 @@
-﻿using MyShop.Domain;
+﻿using MyShop.Application.Identity;
+using MyShop.Domain;
 using MyShop.Domain.Account;
 using MyShop.Models;
 using MyShop.Models.Dto.Account;
@@ -13,7 +14,7 @@ namespace MyShop.Application.Account.implement
     public class AccountReadService : BaseService, IAccountReadService
     {
         private readonly IAccountReadRepository _repo;
-        public AccountReadService(IMyShopDbContextFactory factory, IAccountReadRepository repo) : base(factory)
+        public AccountReadService(IMyShopDbContextFactory factory, ICurrentUserAccessor currentUser, IAccountReadRepository repo) : base(factory, currentUser)
         {
             _repo = repo;
         }

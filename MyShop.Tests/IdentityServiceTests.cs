@@ -1,15 +1,16 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Moq;
-using Xunit;
 using MyShop.Application.Account;
+using MyShop.Application.Identity;
 using MyShop.Application.Identity.implement;
 using MyShop.Application.Redis;
-using MyShop.Models.Dto.Account;
-using MyShop.Models.Req.Identity;
 using MyShop.Domain;
+using MyShop.Models.Dto.Account;
 using MyShop.Models.Dto.Identity;
+using MyShop.Models.Req.Identity;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace MyShop.Tests
 {
@@ -19,6 +20,7 @@ namespace MyShop.Tests
         public async Task VerifyLoginData_ReturnsFalse_WhenAccountNotFound()
         {
             var factoryMock = new Mock<IMyShopDbContextFactory>();
+            var currentUserMock = new Mock<ICurrentUserAccessor>();
             var hasherMock = new Mock<IPasswordHasher<AccountDto>>();
             var accountReadMock = new Mock<IAccountReadService>();
             var redisMock = new Mock<IRedisService>();
@@ -27,7 +29,7 @@ namespace MyShop.Tests
                 .Setup(x => x.GetLoginAccountData(It.IsAny<Models.Req.Account.GetAccountReq>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((AccountDto?)null);
 
-            var svc = new IdentityService(factoryMock.Object, hasherMock.Object, accountReadMock.Object, redisMock.Object);
+            var svc = new IdentityService(factoryMock.Object, currentUserMock.Object, hasherMock.Object, accountReadMock.Object, redisMock.Object);
 
             var req = new LoginReq { UserName = "noexist", Password = "pwd" };
             var result = await svc.VerifyLoginData(req, CancellationToken.None);
@@ -41,6 +43,7 @@ namespace MyShop.Tests
         public async Task VerifyLoginData_ReturnsFalse_WhenPasswordInvalid()
         {
             var factoryMock = new Mock<IMyShopDbContextFactory>();
+            var currentUserMock = new Mock<ICurrentUserAccessor>();
             var hasherMock = new Mock<IPasswordHasher<AccountDto>>();
             var accountReadMock = new Mock<IAccountReadService>();
             var redisMock = new Mock<IRedisService>();
@@ -54,7 +57,7 @@ namespace MyShop.Tests
                 .Setup(h => h.VerifyHashedPassword(It.IsAny<AccountDto>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(PasswordVerificationResult.Failed);
 
-            var svc = new IdentityService(factoryMock.Object, hasherMock.Object, accountReadMock.Object, redisMock.Object);
+            var svc = new IdentityService(factoryMock.Object, currentUserMock.Object, hasherMock.Object, accountReadMock.Object, redisMock.Object);
 
             var req = new LoginReq { UserName = "user1", Password = "wrongpwd" };
             var result = await svc.VerifyLoginData(req, CancellationToken.None);
@@ -68,6 +71,7 @@ namespace MyShop.Tests
         public async Task VerifyLoginData_ReturnsTrue_And_ClearsPasswords_WhenSuccess()
         {
             var factoryMock = new Mock<IMyShopDbContextFactory>();
+            var currentUserMock = new Mock<ICurrentUserAccessor>();
             var hasherMock = new Mock<IPasswordHasher<AccountDto>>();
             var accountReadMock = new Mock<IAccountReadService>();
             var redisMock = new Mock<IRedisService>();
@@ -81,7 +85,7 @@ namespace MyShop.Tests
                 .Setup(h => h.VerifyHashedPassword(It.IsAny<AccountDto>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(PasswordVerificationResult.Success);
 
-            var svc = new IdentityService(factoryMock.Object, hasherMock.Object, accountReadMock.Object, redisMock.Object);
+            var svc = new IdentityService(factoryMock.Object, currentUserMock.Object, hasherMock.Object, accountReadMock.Object, redisMock.Object);
 
             var req = new LoginReq { UserName = "gooduser", Password = "correctpwd" };
             var result = await svc.VerifyLoginData(req, CancellationToken.None);

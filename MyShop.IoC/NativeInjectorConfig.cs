@@ -18,6 +18,9 @@ namespace MyShop.IoC
     {
         public static void RegisterService(this IServiceCollection services, IConfiguration config)
         {
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+
             services.AddSingleton<IPasswordHasher<AccountDto>, PasswordHasher<AccountDto>>();
 
             services.AddSingleton<IConnectionMultiplexer>(_ =>

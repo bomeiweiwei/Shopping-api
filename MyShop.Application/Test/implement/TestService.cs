@@ -1,4 +1,5 @@
-﻿using MyShop.Application.Redis;
+﻿using MyShop.Application.Identity;
+using MyShop.Application.Redis;
 using MyShop.Domain;
 using MyShop.Shared.Enums;
 using System;
@@ -10,7 +11,7 @@ namespace MyShop.Application.Test.implement
     public class TestService : BaseService, ITestService
     {
         private readonly IRedisService _redis;
-        public TestService(IMyShopDbContextFactory factory, IRedisService redis) : base(factory)
+        public TestService(IMyShopDbContextFactory factory, ICurrentUserAccessor currentUser, IRedisService redis) : base(factory, currentUser)
         {
             _redis = redis;
         }
