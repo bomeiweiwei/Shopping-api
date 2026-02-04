@@ -1,3 +1,4 @@
+using MyShop.Api.Extensions;
 using MyShop.IoC;
 using MyShop.Shared.Enums;
 using MyShop.Shared.Extensions;
@@ -31,6 +32,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseApiLogging();
 
 app.UseAuthorization();
 
