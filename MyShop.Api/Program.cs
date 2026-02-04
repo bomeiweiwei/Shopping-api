@@ -4,8 +4,17 @@ using MyShop.Shared.Enums;
 using MyShop.Shared.Extensions;
 using MyShop.Shared.SysConfigs;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Host.UseSerilog((ctx, services, cfg) =>
+{
+    cfg.ReadFrom.Configuration(ctx.Configuration)
+       .ReadFrom.Services(services)
+       .Enrich.FromLogContext();
+});
 
 // Add services to the container.
 
