@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using MyShop.Application.Identity;
 using MyShop.Application.Test;
 using MyShop.Application.Test.implement;
+using MyShop.Models;
 using MyShop.Models.Req.Identity;
+using MyShop.Models.Resp.Identity;
 
 namespace MyShop.Api.Controllers
 {
@@ -36,12 +38,11 @@ namespace MyShop.Api.Controllers
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("Login")]
-        public async Task<IActionResult> Login(LoginReq req)
+        [HttpPost("login")]
+        public async Task<ActionResult<ApiResponseBase<LoginResp>>> Login(LoginReq req)
         {
             var result = await _loginManagerService.UserLogin(req);
-            return Ok(new { result });
+            return Ok(result);
         }
     }
 }

@@ -21,10 +21,10 @@ namespace MyShop.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetEnv")]
-        public async Task<IActionResult> GetEnv()
+        public async Task<ActionResult<string>> GetEnv()
         {
             var environment = _env.EnvironmentName;
-            return Ok(new { environment });
+            return Ok(environment);
         }
         /// <summary>
         /// 檢查資料庫連線
@@ -32,26 +32,26 @@ namespace MyShop.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetConnectResult")]
-        public async Task<IActionResult> GetConnectResult()
+        public async Task<ActionResult<bool>> GetConnectResult()
         {
             var connectResult = await _testService.GetConnectResult();
-            return Ok(new { connectResult });
+            return Ok(connectResult);
         }
 
         [HttpGet]
         [Route("TrySetRedis")]
-        public async Task<IActionResult> TrySetRedis(string key, string value)
+        public async Task<ActionResult<bool>> TrySetRedis(string key, string value)
         {
             var result = await _testService.TrySetRedis(key, value, TimeSpan.FromMinutes(10));
-            return Ok(new { result });
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("TryGetRedis")]
-        public async Task<IActionResult> TryGetRedis(string key)
+        public async Task<ActionResult<string>> TryGetRedis(string key)
         {
             var result = await _testService.TryGetRedis(key);
-            return Ok(new { result });
+            return Ok(result);
         }
     }
 }
