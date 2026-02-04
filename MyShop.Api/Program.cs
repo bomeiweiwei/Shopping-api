@@ -54,24 +54,46 @@ else
     {
         errorApp.Run(async context =>
         {
+            
             var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
             var feature = context.Features.Get<IExceptionHandlerPathFeature>();
             var ex = feature?.Error;
+
+            var traceId = context.TraceIdentifier;
 
             CustomErrorResponse errorResponse;
             if (ex is HttpStatusException httpEx)
             {
                 context.Response.StatusCode = httpEx.HttpStatusCode;
-                errorResponse = new CustomErrorResponse(httpEx.Message, (int)httpEx.AppStatusCode);
+                errorResponse = new CustomErrorResponse(httpEx.Message, (int)httpEx.AppStatusCode)
+                {
+                    TraceId = traceId
+                };
 
-                logger.LogWarning(ex, "Handled business exception at {Path}", context.Request.Path);
+                logger.LogWarning(
+                    ex,
+                    "Handled business exception. TraceId={TraceId}, Path={Path}",
+                    traceId,
+                    context.Request.Path
+                );
             }
             else
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                errorResponse = new CustomErrorResponse("An unexpected error occurred.", (int)ReturnCode.ExceptionError);
+                errorResponse = new CustomErrorResponse(
+                    "An unexpected error occurred.",
+                    (int)ReturnCode.ExceptionError
+                )
+                {
+                    TraceId = traceId
+                };
 
-                logger.LogError(ex, "Unhandled exception at {Path}", context.Request.Path);
+                logger.LogError(
+                   ex,
+                   "Unhandled exception. TraceId={TraceId}, Path={Path}",
+                   traceId,
+                   context.Request.Path
+               );
             }
 
             context.Response.ContentType = "application/json";

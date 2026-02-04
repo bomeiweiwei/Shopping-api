@@ -9,6 +9,7 @@ namespace MyShop.Models.Resp.Error
     {
         public string Message { get; set; }
         public int StatusCode { get; set; }
+        public string? TraceId { get; set; }
 
         public CustomErrorResponse(string message, int statusCode = StatusCodes.Status401Unauthorized)
         {
