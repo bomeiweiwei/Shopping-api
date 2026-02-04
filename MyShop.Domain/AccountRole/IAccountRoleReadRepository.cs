@@ -11,5 +11,7 @@ namespace MyShop.Domain.AccountRole
     public interface IAccountRoleReadRepository
     {
         Task<AccountRoleDto?> GetAccountRoleData(GetAccountRoleReq req, CancellationToken ct = default);
+
+        Task<List<AccountRoleDto>> GetAccountRolesData(GetAccountRoleReq req, CancellationToken ct = default);
     }
 }

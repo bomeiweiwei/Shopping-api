@@ -32,5 +32,21 @@ namespace MyShop.Infrastructure.Repositories.AccountRole
 
             return result;
         }
+
+        public async Task<List<AccountRoleDto>> GetAccountRolesData(GetAccountRoleReq req, CancellationToken ct = default) 
+        {
+            var result = new List<AccountRoleDto>();
+            using var ctx = _factory.Create(ConnectionMode.Slave);
+            var db = ctx.AsDbContext<MyShopContext>();
+
+            result = await db.AccountRoles.Where(m => m.AccountId == req.AccountId)
+                            .Select(m => new AccountRoleDto 
+                            { 
+                                AccountId = m.AccountId, 
+                                RoleId = m.RoleId 
+                            }).ToListAsync(ct);
+
+            return result;
+        }
     }
 }

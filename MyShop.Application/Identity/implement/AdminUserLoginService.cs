@@ -61,7 +61,8 @@ namespace MyShop.Application.Identity.implement
                 AccountId = account.AccountId,
                 RoleId = roleId
             };
-            var chkRoleData = await _accountRoleReadRepository.GetAccountRoleData(getAccountRoleReq, ct);
+            var accountRoleDatas = await _accountRoleReadRepository.GetAccountRolesData(getAccountRoleReq, ct);
+            var chkRoleData= accountRoleDatas.Where(x => x.RoleId == roleId).FirstOrDefault();
             if (chkRoleData == null)
                 return result;
 
@@ -87,12 +88,15 @@ namespace MyShop.Application.Identity.implement
             {
                 new Claim("AccountId", account.AccountId.ToString()),
                 new Claim("UserName", account.UserName),
-                new Claim("UserRole", roleId.ToString()),
                 new Claim("Expiration",expirationTime.ToString("o"))
             };
             foreach (var permission in permissions)
             {
                 claims.Add(new Claim("Permission", permission.PermissionCode.ToString()));
+            }
+            foreach (var role in accountRoleDatas)
+            {
+                claims.Add(new Claim("UserRole", role.RoleId.ToString()));
             }
             // 產生Token
             var token = await _identityService.GetJwtToken(claims, expirationTime);
