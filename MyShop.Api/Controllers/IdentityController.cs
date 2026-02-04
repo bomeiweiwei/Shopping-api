@@ -6,6 +6,8 @@ using MyShop.Application.Test.implement;
 using MyShop.Models;
 using MyShop.Models.Req.Identity;
 using MyShop.Models.Resp.Identity;
+using MyShop.Shared.Enums;
+using MyShop.Shared.Mapper;
 
 namespace MyShop.Api.Controllers
 {
@@ -13,25 +15,11 @@ namespace MyShop.Api.Controllers
     [ApiController]
     public class IdentityController : ControllerBase
     {
-        private readonly IIdentityService _service;
         private readonly ILoginManagerService _loginManagerService;
-        public IdentityController(IIdentityService service, ILoginManagerService loginManagerService)
+        public IdentityController(ILoginManagerService loginManagerService)
         {
-            _service = service;
             _loginManagerService = loginManagerService;
         }
-        /// <summary>
-        /// 檢查是否能登入
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        //[HttpPost]
-        //[Route("ChkLogin")]
-        //public async Task<IActionResult> ChkLogin(LoginReq req)
-        //{
-        //    var result = await _service.ChkLogin(req);
-        //    return Ok(new { result });
-        //}
 
         /// <summary>
         /// 登入
@@ -39,10 +27,12 @@ namespace MyShop.Api.Controllers
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost("login")]
-        public async Task<ActionResult<ApiResponseBase<LoginResp>>> Login(LoginReq req)
+        public async Task<ActionResult<ApiResponseBase<LoginResp>>> Login([FromBody] LoginReq req, CancellationToken ct)
         {
-            var result = await _loginManagerService.UserLogin(req);
-            return Ok(result);
+            var result = await _loginManagerService.UserLogin(req, ct);
+
+            var httpCode = ((ReturnCode)result.StatusCode).ToHttpStatusCode();
+            return StatusCode(httpCode, result);
         }
     }
 }

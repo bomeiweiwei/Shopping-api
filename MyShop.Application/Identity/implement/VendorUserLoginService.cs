@@ -7,6 +7,7 @@ using MyShop.Models.Req.AccountRole;
 using MyShop.Models.Req.Identity;
 using MyShop.Models.Resp.Identity;
 using MyShop.Shared.Enums;
+using MyShop.Shared.Extensions;
 using System.Security.Claims;
 
 namespace MyShop.Application.Identity.implement
@@ -43,9 +44,17 @@ namespace MyShop.Application.Identity.implement
             };
             var verify = await _identityService.VerifyLoginData(req, ct);
             if (!verify.IsVerifySuccess)
+            {
+                result.StatusCode = (long)ReturnCode.AccountNotFound;
+                result.Message = ReturnCode.AccountNotFound.GetDescription();
                 return result;
+            }
             if (verify.Data == null)
+            {
+                result.StatusCode = (long)ReturnCode.AccountNotFound;
+                result.Message = ReturnCode.AccountNotFound.GetDescription();
                 return result;
+            }
             // 取得帳號資料
             var account = verify.Data;
             int roleId = (int)userRole;
@@ -56,7 +65,11 @@ namespace MyShop.Application.Identity.implement
             };
             var chkRoleData = await _accountRoleReadRepository.GetAccountRoleData(getAccountRoleReq, ct);
             if (chkRoleData == null)
+            {
+                result.StatusCode = (long)ReturnCode.UserRoleNotFound;
+                result.Message = ReturnCode.UserRoleNotFound.GetDescription();
                 return result;
+            }
 
             // 設定時間
             DateTime expirationTime = DateTime.UtcNow.AddHours(24);

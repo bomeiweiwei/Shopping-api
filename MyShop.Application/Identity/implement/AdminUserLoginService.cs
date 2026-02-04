@@ -9,6 +9,7 @@ using MyShop.Models.Req.AdminPermission;
 using MyShop.Models.Req.Identity;
 using MyShop.Models.Resp.Identity;
 using MyShop.Shared.Enums;
+using MyShop.Shared.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -50,9 +51,17 @@ namespace MyShop.Application.Identity.implement
             };
             var verify = await _identityService.VerifyLoginData(req, ct);
             if (!verify.IsVerifySuccess)
+            {
+                result.StatusCode = (long)ReturnCode.AccountNotFound;
+                result.Message = ReturnCode.AccountNotFound.GetDescription();
                 return result;
+            }
             if (verify.Data == null)
+            {
+                result.StatusCode = (long)ReturnCode.AccountNotFound;
+                result.Message = ReturnCode.AccountNotFound.GetDescription();
                 return result;
+            }
             // 取得帳號資料
             var account = verify.Data;
             int roleId = (int)userRole;
@@ -64,8 +73,11 @@ namespace MyShop.Application.Identity.implement
             var accountRoleDatas = await _accountRoleReadRepository.GetAccountRolesData(getAccountRoleReq, ct);
             var chkRoleData= accountRoleDatas.Where(x => x.RoleId == roleId).FirstOrDefault();
             if (chkRoleData == null)
+            {
+                result.StatusCode = (long)ReturnCode.UserRoleNotFound;
+                result.Message = ReturnCode.UserRoleNotFound.GetDescription();
                 return result;
-
+            }
             GetAdminPermissionsDataReq getAdminPermissionsDataReq = new GetAdminPermissionsDataReq()
             {
                 AccountId = account.AccountId
