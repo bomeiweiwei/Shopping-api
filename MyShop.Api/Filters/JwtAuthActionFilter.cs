@@ -149,8 +149,14 @@ namespace MyShop.Api.Filters
                     }
                 }
                 #endregion
+
+                int? primaryRole = context.HttpContext.User.Claims
+                                    .Where(c => c.Type == "PrimaryUserRole")
+                                    .Select(c => int.TryParse(c.Value, out var r) ? r : (int?)null)
+                                    .FirstOrDefault(r => r.HasValue);
+
                 #region 當角色為Admin時，進行方法的權限檢查
-                if (userRoles.Contains((int)UserRole.Admin))
+                if (primaryRole == (int)UserRole.Admin)
                 {
                     // 權限檢查開始（PermissionAuthorizeAttribute）
                     var permissionAttr = context.ActionDescriptor.EndpointMetadata
@@ -161,7 +167,9 @@ namespace MyShop.Api.Filters
                     {
                         var userPermissions = context.HttpContext.User.Claims
                                                 .Where(c => c.Type == "Permission")
-                                                .Select(c => int.Parse(c.Value))
+                                                .Select(c => int.TryParse(c.Value, out var p) ? p : (int?)null)
+                                                .Where(p => p.HasValue)
+                                                .Select(p => p!.Value)
                                                 .ToHashSet();
 
                         bool hasPermission = permissionAttr.RequiredPermissions.Any(rp => userPermissions.Contains(rp));

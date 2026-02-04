@@ -75,6 +75,7 @@ namespace MyShop.Application.Identity.implement
                 new Claim("AccountId", account.AccountId.ToString()),
                 new Claim("UserName", account.UserName),
                 new Claim("UserRole", roleId.ToString()),
+                 new Claim("PrimaryUserRole", roleId.ToString()),
                 new Claim("Expiration", expirationTime.ToString("o"))
             };
             // 產生Token
