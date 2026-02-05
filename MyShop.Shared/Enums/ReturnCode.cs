@@ -20,6 +20,8 @@ namespace MyShop.Shared.Enums
         InvalidPassword = 1002,
         [Description("帳號被鎖定")]
         AccountLocked = 1003,
+        [Description("會員帳號已存在")]
+        AccountAlreadyExists = 1004,
 
         // ===== 權限相關 =====
         [Description("無權限")]

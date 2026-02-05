@@ -1,0 +1,20 @@
+﻿using MyShop.Models.Dto.Account;
+using MyShop.Models.Req.Account;
+using MyShop.Models.Resp.Account;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MyShop.Domain.Account
+{
+    public interface IAccountCreateRepository
+    {
+        /// <summary>
+        /// 建立會員帳號
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<MemberRegisterResp> CreateMemberAccountWithProfileAsync(MemberRegisterDto dto, CancellationToken ct = default);
+    }
+}

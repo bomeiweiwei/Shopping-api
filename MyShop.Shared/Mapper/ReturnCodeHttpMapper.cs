@@ -19,6 +19,7 @@ namespace MyShop.Shared.Mapper
                 ReturnCode.AccountNotFound => StatusCodes.Status404NotFound,
                 ReturnCode.InvalidPassword => StatusCodes.Status401Unauthorized,
                 ReturnCode.AccountLocked => StatusCodes.Status403Forbidden,
+                ReturnCode.AccountAlreadyExists => StatusCodes.Status409Conflict,
 
                 // 權限
                 ReturnCode.PermissionDenied => StatusCodes.Status403Forbidden,
