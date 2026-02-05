@@ -32,7 +32,7 @@ namespace MyShop.Infrastructure.Repositories.Account
             var db = ctx.AsDbContext<MyShopContext>();
             var strategy = db.Database.CreateExecutionStrategy();
 
-            var exists = await db.Accounts.AnyAsync(a => a.Username == dto.Username, ct);
+            var exists = await db.Accounts.AsNoTracking().AnyAsync(a => a.Username == dto.Username, ct);
             if (exists)
                 // throw 自訂義Exception
                 throw new AccountAlreadyExistsException(dto.Username);
@@ -101,7 +101,7 @@ namespace MyShop.Infrastructure.Repositories.Account
             var db = ctx.AsDbContext<MyShopContext>();
             var strategy = db.Database.CreateExecutionStrategy();
 
-            var exists = await db.Accounts.AnyAsync(a => a.Username == dto.Username, ct);
+            var exists = await db.Accounts.AsNoTracking().AnyAsync(a => a.Username == dto.Username, ct);
             if (exists)
                 // throw 自訂義Exception
                 throw new AccountAlreadyExistsException(dto.Username);
@@ -154,6 +154,43 @@ namespace MyShop.Infrastructure.Repositories.Account
             });
 
             return result;
+        }
+        /// <summary>
+        /// 建立後台管理員帳號(步驟一)
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<long> StepCreateBasicAdminAccountAsync(IMyShopDbContext ctx, AdminCreateDto dto, CancellationToken ct = default)
+        {
+            var db = ctx.AsDbContext<MyShopContext>();
+            var exists = await db.Accounts.AsNoTracking().AnyAsync(a => a.Username == dto.Username, ct);
+            if (exists)
+                // throw 自訂義Exception
+                throw new AccountAlreadyExistsException(dto.Username);
+            var account = new EF.Models.Account
+            {
+                Username = dto.Username,
+                PasswordHash = dto.PasswordHash,
+                Email = dto.Email,
+                Status = (int)Status.Active,
+                CreatedAt = dto.CreatedAt,
+                CreatedBy = dto.CreatedBy,
+            };
+            await db.Accounts.AddAsync(account, ct);
+            await ctx.SaveChangesAsync(ct);
+
+            var accountRole = new EF.Models.AccountRole
+            {
+                AccountId = account.AccountId,
+                RoleId = (int)UserRole.Admin,
+                CreatedAt = dto.CreatedAt,
+            };
+            await db.AccountRoles.AddAsync(accountRole, ct);
+            await ctx.SaveChangesAsync(ct);
+
+            return account.AccountId;
         }
     }
 }

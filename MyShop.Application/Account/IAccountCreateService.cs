@@ -24,5 +24,12 @@ namespace MyShop.Application.Account
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponseBase<VendorRegisterResp>> CreateVendorAccountWithProfileAsync(AccountRegisterReq req, CancellationToken ct = default);
+        /// <summary>
+        /// 建立後台管理員帳號
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponseBase<AdminCreateResp>> CreateAdminAccountAsync(AdminAccountRegisterReq req, CancellationToken ct = default);
     }
 }
