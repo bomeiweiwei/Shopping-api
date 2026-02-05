@@ -16,5 +16,12 @@ namespace MyShop.Domain.Account
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<MemberRegisterResp> CreateMemberAccountWithProfileAsync(MemberRegisterDto dto, CancellationToken ct = default);
+        /// <summary>
+        /// 建立廠商帳號
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<VendorRegisterResp> CreateVendorAccountWithProfileAsync(VendorRegisterDto dto, CancellationToken ct = default);
     }
 }

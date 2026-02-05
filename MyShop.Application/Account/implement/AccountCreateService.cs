@@ -28,7 +28,7 @@ namespace MyShop.Application.Account.implement
             _logger = logger;
         }
 
-        public async Task<ApiResponseBase<MemberRegisterResp>> CreateMemberAccountWithProfileAsync(MemberRegisterReq req, CancellationToken ct = default)
+        public async Task<ApiResponseBase<MemberRegisterResp>> CreateMemberAccountWithProfileAsync(AccountRegisterReq req, CancellationToken ct = default)
         {
             var result = new ApiResponseBase<MemberRegisterResp>();
             try
@@ -44,9 +44,51 @@ namespace MyShop.Application.Account.implement
 
                 dto.PasswordHash = _hasher.HashPassword(null!, req.Password);
 
-                req.Password = string.Empty;
-
                 result.Data = await _repo.CreateMemberAccountWithProfileAsync(dto, ct);
+
+                req.Password = string.Empty;
+                dto.PasswordHash = string.Empty;
+            }
+            catch (AccountAlreadyExistsException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Account already exists. Username={Username}",
+                    req.Username
+                );
+                result.StatusCode = (long)ReturnCode.AccountAlreadyExists;
+                result.Message = ReturnCode.AccountAlreadyExists.GetDescription();
+            }
+            catch (Exception)
+            {
+                result.StatusCode = (long)ReturnCode.ExceptionError;
+                result.Message = ReturnCode.ExceptionError.GetDescription();
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<ApiResponseBase<VendorRegisterResp>> CreateVendorAccountWithProfileAsync(AccountRegisterReq req, CancellationToken ct = default)
+        {
+            var result = new ApiResponseBase<VendorRegisterResp>();
+            try
+            {
+                VendorRegisterDto dto = new VendorRegisterDto()
+                {
+                    Username = req.Username,
+                    Password = req.Password,
+                    Email = req.Email,
+                    Phone = req.Phone,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                dto.PasswordHash = _hasher.HashPassword(null!, req.Password);
+
+                result.Data = await _repo.CreateVendorAccountWithProfileAsync(dto, ct);
+
+                req.Password = string.Empty;
+                dto.PasswordHash = string.Empty;
             }
             catch (AccountAlreadyExistsException ex)
             {

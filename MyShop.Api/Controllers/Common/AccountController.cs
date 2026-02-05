@@ -26,9 +26,23 @@ namespace MyShop.Api.Controllers.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         [HttpPost("register")]
-        public async Task<ActionResult<ApiResponseBase<MemberRegisterResp>>> MemberRegister([FromBody] MemberRegisterReq req, CancellationToken ct)
+        public async Task<ActionResult<ApiResponseBase<MemberRegisterResp>>> MemberRegister([FromBody] AccountRegisterReq req, CancellationToken ct)
         {
             var result = await _accountCreateService.CreateMemberAccountWithProfileAsync(req, ct);
+
+            var httpCode = ((ReturnCode)result.StatusCode).ToHttpStatusCode();
+            return StatusCode(httpCode, result);
+        }
+        /// <summary>
+        /// 廠商註冊
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpPost("apply")]
+        public async Task<ActionResult<ApiResponseBase<VendorRegisterResp>>> VendorRegister([FromBody] AccountRegisterReq req, CancellationToken ct)
+        {
+            var result = await _accountCreateService.CreateVendorAccountWithProfileAsync(req, ct);
 
             var httpCode = ((ReturnCode)result.StatusCode).ToHttpStatusCode();
             return StatusCode(httpCode, result);

@@ -1,4 +1,5 @@
 ﻿using MyShop.Models;
+using MyShop.Models.Dto.Account;
 using MyShop.Models.Req.Account;
 using MyShop.Models.Resp.Account;
 using System;
@@ -15,6 +16,13 @@ namespace MyShop.Application.Account
         /// <param name="req"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponseBase<MemberRegisterResp>> CreateMemberAccountWithProfileAsync(MemberRegisterReq req, CancellationToken ct = default);
+        Task<ApiResponseBase<MemberRegisterResp>> CreateMemberAccountWithProfileAsync(AccountRegisterReq req, CancellationToken ct = default);
+        /// <summary>
+        /// 建立廠商帳號
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponseBase<VendorRegisterResp>> CreateVendorAccountWithProfileAsync(AccountRegisterReq req, CancellationToken ct = default);
     }
 }

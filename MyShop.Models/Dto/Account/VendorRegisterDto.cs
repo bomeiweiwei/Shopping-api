@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MyShop.Models.Dto.Account
 {
-    public class MemberRegisterDto : AccountRegisterReq
+    public class VendorRegisterDto : AccountRegisterReq
     {
         public string PasswordHash { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }

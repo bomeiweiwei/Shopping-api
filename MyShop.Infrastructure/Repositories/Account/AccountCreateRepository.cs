@@ -19,6 +19,12 @@ namespace MyShop.Infrastructure.Repositories.Account
     {
         private readonly IMyShopDbContextFactory _factory;
         public AccountCreateRepository(IMyShopDbContextFactory factory) => _factory = factory;
+        /// <summary>
+        /// 建立會員帳號
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         public async Task<MemberRegisterResp> CreateMemberAccountWithProfileAsync(MemberRegisterDto dto, CancellationToken ct = default)
         {
             var result = new MemberRegisterResp();
@@ -56,6 +62,64 @@ namespace MyShop.Infrastructure.Repositories.Account
                         CreatedAt = dto.CreatedAt,
                     };
                     await db.MemberProfiles.AddAsync(profile, ct);
+                    await db.SaveChangesAsync(ct);
+
+                    await tx.CommitAsync(ct);
+
+                    result.AccountId = account.AccountId;
+                    result.Username = account.Username;
+                    result.CreatedAt = account.CreatedAt;
+                }
+                catch
+                {
+                    await tx.RollbackAsync(ct);
+                    throw;
+                }
+            });
+
+            return result;
+        }
+        /// <summary>
+        /// 建立廠商帳號
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<VendorRegisterResp> CreateVendorAccountWithProfileAsync(VendorRegisterDto dto, CancellationToken ct = default)
+        {
+            var result = new VendorRegisterResp();
+            using var ctx = _factory.Create(ConnectionMode.Master);
+            var db = ctx.AsDbContext<MyShopContext>();
+            var strategy = db.Database.CreateExecutionStrategy();
+
+            var exists = await db.Accounts.AnyAsync(a => a.Username == dto.Username, ct);
+            if (exists)
+                // throw 自訂義Exception
+                throw new AccountAlreadyExistsException(dto.Username);
+
+            await strategy.ExecuteAsync(async () =>
+            {
+                await using var tx = await db.Database.BeginTransactionAsync(ct);
+                try
+                {
+                    var account = new EF.Models.Account
+                    {
+                        Username = dto.Username,
+                        PasswordHash = dto.PasswordHash,
+                        Email = dto.Email,
+                        Status = (int)Status.Active,
+                        CreatedAt = dto.CreatedAt,
+                    };
+                    await db.Accounts.AddAsync(account, ct);
+                    await db.SaveChangesAsync(ct);
+
+                    var profile = new EF.Models.VendorProfile
+                    {
+                        AccountId = account.AccountId,
+                        ReviewStatus = (int)Status.Disabled,
+                        CreatedAt = dto.CreatedAt,
+                    };
+                    await db.VendorProfiles.AddAsync(profile, ct);
                     await db.SaveChangesAsync(ct);
 
                     await tx.CommitAsync(ct);
