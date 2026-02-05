@@ -42,7 +42,7 @@ namespace MyShop.Infrastructure.Repositories.Account
                         PasswordHash = dto.PasswordHash,
                         Email = dto.Email,
                         Status = (int)Status.Active,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = dto.CreatedAt,
                     };
                     await db.Accounts.AddAsync(account, ct);
                     await db.SaveChangesAsync(ct);
@@ -53,7 +53,7 @@ namespace MyShop.Infrastructure.Repositories.Account
                         DisplayName = dto.Username,
                         Phone = dto.Phone,
                         Status = (int)Status.Active,
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = dto.CreatedAt,
                     };
                     await db.MemberProfiles.AddAsync(profile, ct);
                     await db.SaveChangesAsync(ct);

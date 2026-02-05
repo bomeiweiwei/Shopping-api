@@ -8,7 +8,7 @@ namespace MyShop.Models.Req.Account
     public class MemberRegisterReq : IValidatableObject
     {
         [Required(ErrorMessage = "登入帳號必填")]
-        [StringLength(20, MinimumLength = 4, ErrorMessage = "登入帳號長度需介於 4~20")]
+        [StringLength(20, MinimumLength = 2, ErrorMessage = "登入帳號長度需介於 2~20")]
         [RegularExpression(@"^[A-Za-z0-9._-]+$", ErrorMessage = "登入帳號僅允許英數字與 . _ -")]
         public string Username { get; set; }
 

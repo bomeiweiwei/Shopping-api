@@ -38,7 +38,8 @@ namespace MyShop.Application.Account.implement
                     Username = req.Username,
                     Password = req.Password,
                     Email = req.Email,
-                    Phone = req.Phone
+                    Phone = req.Phone,
+                    CreatedAt = DateTime.UtcNow // DateTime.UtcNow.ToTaipeiTime();
                 };
 
                 dto.PasswordHash = _hasher.HashPassword(null!, req.Password);

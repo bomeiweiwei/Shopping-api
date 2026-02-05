@@ -8,5 +8,6 @@ namespace MyShop.Models.Dto.Account
     public class MemberRegisterDto : MemberRegisterReq
     {
         public string PasswordHash { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
     }
 }
