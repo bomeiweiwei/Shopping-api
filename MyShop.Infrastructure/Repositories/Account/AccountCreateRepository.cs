@@ -64,6 +64,15 @@ namespace MyShop.Infrastructure.Repositories.Account
                     await db.MemberProfiles.AddAsync(profile, ct);
                     await db.SaveChangesAsync(ct);
 
+                    var accountRole = new EF.Models.AccountRole
+                    {
+                        AccountId = account.AccountId,
+                        RoleId = (int)UserRole.Member,
+                        CreatedAt = dto.CreatedAt,
+                    };
+                    await db.AccountRoles.AddAsync(accountRole, ct);
+                    await db.SaveChangesAsync(ct);
+
                     await tx.CommitAsync(ct);
 
                     result.AccountId = account.AccountId;
@@ -120,6 +129,15 @@ namespace MyShop.Infrastructure.Repositories.Account
                         CreatedAt = dto.CreatedAt,
                     };
                     await db.VendorProfiles.AddAsync(profile, ct);
+                    await db.SaveChangesAsync(ct);
+
+                    var accountRole = new EF.Models.AccountRole
+                    {
+                        AccountId = account.AccountId,
+                        RoleId = (int)UserRole.Vendor,
+                        CreatedAt = dto.CreatedAt,
+                    };
+                    await db.AccountRoles.AddAsync(accountRole, ct);
                     await db.SaveChangesAsync(ct);
 
                     await tx.CommitAsync(ct);
