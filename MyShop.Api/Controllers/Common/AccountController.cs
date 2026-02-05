@@ -39,7 +39,7 @@ namespace MyShop.Api.Controllers.Common
         /// <param name="req"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("apply")]
+        [HttpPost("vregister")]
         public async Task<ActionResult<ApiResponseBase<VendorRegisterResp>>> VendorRegister([FromBody] AccountRegisterReq req, CancellationToken ct)
         {
             var result = await _accountCreateService.CreateVendorAccountWithProfileAsync(req, ct);

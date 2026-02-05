@@ -28,7 +28,7 @@ namespace MyShop.Api.Controllers.Admin
         /// <param name="req"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("register")]
         [PermissionAuthorize(PermissionCode.Account_Create)]
         public async Task<ActionResult<ApiResponseBase<MemberRegisterResp>>> Create([FromBody] AdminAccountRegisterReq req, CancellationToken ct)
         {
