@@ -34,6 +34,8 @@ public partial class MyShopContext : DbContext
 
     public virtual DbSet<HotStore> HotStores { get; set; }
 
+    public virtual DbSet<MemberProfile> MemberProfiles { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
@@ -282,6 +284,29 @@ public partial class MyShopContext : DbContext
                 .HasForeignKey<HotStore>(d => d.StoreId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_HotStore_Store");
+        });
+
+        modelBuilder.Entity<MemberProfile>(entity =>
+        {
+            entity.HasKey(e => e.MemberId);
+
+            entity.ToTable("MemberProfile");
+
+            entity.HasIndex(e => e.AccountId, "IX_MemberProfile_AccountId");
+
+            entity.HasIndex(e => e.AccountId, "UQ_MemberProfile_AccountId").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_MemberProfile_CreatedAt");
+            entity.Property(e => e.DisplayName).HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(30);
+            entity.Property(e => e.UpdatedAt).HasPrecision(0);
+
+            entity.HasOne(d => d.Account).WithOne(p => p.MemberProfile)
+                .HasForeignKey<MemberProfile>(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MemberProfile_Account");
         });
 
         modelBuilder.Entity<Order>(entity =>

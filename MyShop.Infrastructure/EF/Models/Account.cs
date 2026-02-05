@@ -33,6 +33,8 @@ public partial class Account
 
     public virtual ICollection<FavoriteStore> FavoriteStores { get; set; } = new List<FavoriteStore>();
 
+    public virtual MemberProfile? MemberProfile { get; set; }
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual VendorProfile? VendorProfile { get; set; }
